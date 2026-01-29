@@ -10,14 +10,13 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Repository for AuditLog entity with comprehensive query methods
  * for security monitoring and compliance.
  */
 @Repository
-public interface AuditLogRepository extends JpaRepository<AuditLog, UUID> {
+public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
 
     /**
      * Find audit logs by user

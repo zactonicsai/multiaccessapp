@@ -161,9 +161,9 @@ public class AccessControlService {
                 if (!context.isExecutive() && !context.isDepartmentHead() 
                     && !context.hasAnyRole("EXECUTIVE", "DEPARTMENT_MANAGER")) {
                     // Must be in same department
-                    if (!context.belongsToDepartment(data.getDepartmentId())) {
+                    if (!context.belongsToDepartment(data.getOwnerDepartment())) {
                         result.setAllowed(false);
-                        result.setReason("Department level data requires membership in department: " + data.getDepartmentId());
+                        result.setReason("Department level data requires membership in department: " + data.getOwnerDepartment());
                         return result;
                     }
                 }
@@ -172,9 +172,9 @@ public class AccessControlService {
             case TEAM:
                 if (!context.isExecutive() && !context.isDepartmentHead()) {
                     // Must be team lead of the team OR in the same team
-                    if (!context.belongsToTeam(data.getTeamId())) {
+                    if (!context.belongsToTeam(data.getOwnerTeam())) {
                         result.setAllowed(false);
-                        result.setReason("Team level data requires membership in team: " + data.getTeamId());
+                        result.setReason("Team level data requires membership in team: " + data.getOwnerTeam());
                         return result;
                     }
                 }
@@ -242,7 +242,7 @@ public class AccessControlService {
 
         // Check custom access control rules from database
         List<DataAccessControl> rules = accessControlRepository
-            .findActiveRulesForEntity("MyData", data.getId().toString());
+            .findActiveRulesForData(data.getId());
 
         for (DataAccessControl rule : rules) {
             if (!evaluateAccessRule(rule, context, operation)) {
@@ -304,7 +304,7 @@ public class AccessControlService {
 
         // Check specific row-level access rules
         List<DataAccessControl> rowRules = accessControlRepository
-            .findRowLevelRules("MyData", data.getId().toString(), context.getUserId());
+            .findRowLevelRules(data.getId(), context.getUserId());
 
         for (DataAccessControl rule : rowRules) {
             boolean hasPermission = switch (operation) {
@@ -314,7 +314,7 @@ public class AccessControlService {
                 case DELETE -> rule.getCanDelete();
             };
 
-            if (rule.getIsActive() && !hasPermission) {
+            if (rule.getActive() && !hasPermission) {
                 result.setAllowed(false);
                 result.setReason("Row-level access denied by rule: " + rule.getRuleName());
                 return result;
@@ -342,16 +342,16 @@ public class AccessControlService {
 
         // Check column-level access control rules
         List<DataAccessControl> columnRules = accessControlRepository
-            .findColumnLevelRules("MyData", context.getUserId());
+            .findColumnLevelRules(context.getUserId());
 
         for (DataAccessControl rule : columnRules) {
-            if (rule.getDeniedColumns() != null) {
+            if (rule.getVisibleColumns() != null) {
                 try {
-                    List<String> denied = objectMapper.readValue(
-                        rule.getDeniedColumns(), new TypeReference<List<String>>() {});
-                    visibleColumns.removeAll(denied);
+                    List<String> allowed = objectMapper.readValue(
+                        rule.getVisibleColumns(), new TypeReference<List<String>>() {});
+                    visibleColumns.retainAll(allowed);
                 } catch (Exception e) {
-                    log.warn("Failed to parse denied columns for rule {}", rule.getId(), e);
+                    log.warn("Failed to parse visible columns for rule {}", rule.getId(), e);
                 }
             }
         }
@@ -365,12 +365,12 @@ public class AccessControlService {
     private boolean evaluateAccessRule(DataAccessControl rule, SecurityContext context, AccessOperation operation) {
         // Check if rule applies to this principal
         boolean ruleApplies = switch (rule.getPrincipalType()) {
-            case USER -> rule.getPrincipalId().equals(context.getUserId());
-            case ROLE -> context.hasRole(rule.getPrincipalId());
-            case DEPARTMENT -> context.belongsToDepartment(rule.getPrincipalId());
-            case TEAM -> context.belongsToTeam(rule.getPrincipalId());
+            case USER -> rule.getPrincipalValue().equals(context.getUserId());
+            case ROLE -> context.hasRole(rule.getPrincipalValue());
+            case DEPARTMENT -> context.belongsToDepartment(rule.getPrincipalValue());
+            case TEAM -> context.belongsToTeam(rule.getPrincipalValue());
             case CLEARANCE -> context.hasClearance(
-                UserAttribute.ClearanceLevel.valueOf(rule.getPrincipalId()));
+                UserAttribute.ClearanceLevel.valueOf(rule.getPrincipalValue()));
             case ORGANIZATION, ALL -> true;
         };
 
@@ -432,7 +432,7 @@ public class AccessControlService {
 
     private Set<String> getAllColumns() {
         return Set.of("id", "name", "dataDate", "data", "sensitivityLevel",
-            "organizationLevel", "departmentId", "teamId", "ownerId",
+            "organizationLevel", "ownerDepartment", "ownerTeam", "ownerId",
             "confidentialNotes", "financialData", "createdAt", "createdBy",
             "updatedAt", "updatedBy");
     }

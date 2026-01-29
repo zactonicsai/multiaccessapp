@@ -26,8 +26,8 @@ public class SecurityContext {
     private String username;
     private String email;
     private Set<String> roles;
-    private String departmentId;
-    private String teamId;
+    private String department;
+    private String team;
     private UserAttribute.OrganizationLevel organizationLevel;
     private UserAttribute.ClearanceLevel clearanceLevel;
     private String managerId;
@@ -58,8 +58,8 @@ public class SecurityContext {
             .username(jwt.getClaimAsString("preferred_username"))
             .email(jwt.getClaimAsString("email"))
             .roles(CustomJwtAuthenticationConverter.getAllRoles(jwt))
-            .departmentId(jwt.getClaimAsString("department_id"))
-            .teamId(jwt.getClaimAsString("team_id"))
+            .department(jwt.getClaimAsString("department"))
+            .team(jwt.getClaimAsString("team"))
             .organizationLevel(parseOrgLevel(jwt.getClaimAsString("organization_level")))
             .clearanceLevel(parseClearanceLevel(jwt.getClaimAsString("clearance_level")))
             .managerId(jwt.getClaimAsString("manager_id"))
@@ -90,15 +90,15 @@ public class SecurityContext {
     /**
      * Check if user belongs to a department
      */
-    public boolean belongsToDepartment(String department) {
-        return departmentId != null && departmentId.equals(department);
+    public boolean belongsToDepartment(String dept) {
+        return department != null && department.equals(dept);
     }
 
     /**
      * Check if user belongs to a team
      */
-    public boolean belongsToTeam(String team) {
-        return teamId != null && teamId.equals(team);
+    public boolean belongsToTeam(String t) {
+        return team != null && team.equals(t);
     }
 
     /**

@@ -8,14 +8,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository for UserAttribute entity.
  * Provides queries for ABAC attribute lookups.
  */
 @Repository
-public interface UserAttributeRepository extends JpaRepository<UserAttribute, UUID> {
+public interface UserAttributeRepository extends JpaRepository<UserAttribute, Long> {
 
     /**
      * Find by user ID
@@ -30,48 +29,48 @@ public interface UserAttributeRepository extends JpaRepository<UserAttribute, UU
     /**
      * Find all users in a department
      */
-    List<UserAttribute> findByDepartmentIdAndIsActiveTrue(String departmentId);
+    List<UserAttribute> findByDepartmentAndActiveTrue(String department);
 
     /**
      * Find all users in a team
      */
-    List<UserAttribute> findByTeamIdAndIsActiveTrue(String teamId);
+    List<UserAttribute> findByTeamAndActiveTrue(String team);
 
     /**
      * Find all executives
      */
-    List<UserAttribute> findByIsExecutiveTrueAndIsActiveTrue();
+    List<UserAttribute> findByIsExecutiveTrueAndActiveTrue();
 
     /**
      * Find all department heads
      */
-    List<UserAttribute> findByIsDepartmentHeadTrueAndIsActiveTrue();
+    List<UserAttribute> findByIsDepartmentHeadTrueAndActiveTrue();
 
     /**
      * Find all managers
      */
-    List<UserAttribute> findByIsManagerTrueAndIsActiveTrue();
+    List<UserAttribute> findByIsManagerTrueAndActiveTrue();
 
     /**
      * Find users by organization level
      */
-    List<UserAttribute> findByOrganizationLevelAndIsActiveTrue(UserAttribute.OrganizationLevel level);
+    List<UserAttribute> findByOrganizationLevelAndActiveTrue(UserAttribute.OrganizationLevel level);
 
     /**
      * Find users by clearance level
      */
-    List<UserAttribute> findByClearanceLevelAndIsActiveTrue(UserAttribute.ClearanceLevel level);
+    List<UserAttribute> findByClearanceLevelAndActiveTrue(UserAttribute.ClearanceLevel level);
 
     /**
      * Find users with clearance level at or above specified level
      */
-    @Query("SELECT u FROM UserAttribute u WHERE u.clearanceLevel >= :level AND u.isActive = true")
+    @Query("SELECT u FROM UserAttribute u WHERE u.clearanceLevel >= :level AND u.active = true")
     List<UserAttribute> findByMinClearanceLevel(@Param("level") UserAttribute.ClearanceLevel level);
 
     /**
      * Find direct reports of a manager
      */
-    List<UserAttribute> findByManagerIdAndIsActiveTrue(String managerId);
+    List<UserAttribute> findByManagerIdAndActiveTrue(String managerId);
 
     /**
      * Check if user exists
@@ -83,9 +82,9 @@ public interface UserAttributeRepository extends JpaRepository<UserAttribute, UU
      */
     @Query(value = """
         WITH RECURSIVE management_chain AS (
-            SELECT * FROM user_attributes WHERE user_id = :userId
+            SELECT * FROM user_attribute WHERE user_id = :userId
             UNION ALL
-            SELECT ua.* FROM user_attributes ua
+            SELECT ua.* FROM user_attribute ua
             JOIN management_chain mc ON ua.user_id = mc.manager_id
         )
         SELECT * FROM management_chain WHERE user_id != :userId

@@ -13,13 +13,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Set;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Service for managing MyData with comprehensive access control.
@@ -48,18 +49,17 @@ public class MyDataService {
         // Build entity
         MyData entity = MyData.builder()
             .name(request.getName())
-            .dataDate(request.getDataDate())
+            .date(request.getDate())
             .data(request.getData())
             .organizationLevel(request.getOrganizationLevel())
             .sensitivityLevel(request.getSensitivityLevel() != null ? 
                 request.getSensitivityLevel() : MyData.SensitivityLevel.INTERNAL)
-            .departmentId(request.getDepartmentId() != null ? 
-                request.getDepartmentId() : securityContext.getDepartmentId())
-            .teamId(request.getTeamId() != null ? 
-                request.getTeamId() : securityContext.getTeamId())
+            .ownerDepartment(securityContext.getDepartment())
+            .ownerTeam(securityContext.getTeam())
             .ownerId(securityContext.getUserId())
             .confidentialNotes(request.getConfidentialNotes())
             .financialData(request.getFinancialData())
+            .metadata(request.getMetadata())
             .build();
 
         // Check access for creation (mainly for setting confidential fields)
@@ -104,7 +104,7 @@ public class MyDataService {
      */
     @Transactional(readOnly = true)
     public MyDataDto.Response findById(
-            UUID id,
+            Long id,
             SecurityContext securityContext,
             HttpServletRequest httpRequest) {
 
@@ -136,7 +136,7 @@ public class MyDataService {
      */
     @Transactional
     public MyDataDto.Response update(
-            UUID id,
+            Long id,
             MyDataDto.UpdateRequest request,
             SecurityContext securityContext,
             HttpServletRequest httpRequest) {
@@ -168,10 +168,10 @@ public class MyDataService {
                 entity.getName(), request.getName());
             entity.setName(request.getName());
         }
-        if (request.getDataDate() != null && canUpdateColumn("dataDate", visibleColumns)) {
-            logFieldChangeIfDifferent(securityContext, id.toString(), "dataDate",
-                entity.getDataDate(), request.getDataDate());
-            entity.setDataDate(request.getDataDate());
+        if (request.getDate() != null && canUpdateColumn("date", visibleColumns)) {
+            logFieldChangeIfDifferent(securityContext, id.toString(), "date",
+                entity.getDate(), request.getDate());
+            entity.setDate(request.getDate());
         }
         if (request.getData() != null && canUpdateColumn("data", visibleColumns)) {
             logFieldChangeIfDifferent(securityContext, id.toString(), "data",
@@ -188,17 +188,14 @@ public class MyDataService {
                 entity.getSensitivityLevel(), request.getSensitivityLevel());
             entity.setSensitivityLevel(request.getSensitivityLevel());
         }
-        if (request.getDepartmentId() != null && canUpdateColumn("departmentId", visibleColumns)) {
-            entity.setDepartmentId(request.getDepartmentId());
-        }
-        if (request.getTeamId() != null && canUpdateColumn("teamId", visibleColumns)) {
-            entity.setTeamId(request.getTeamId());
-        }
         if (request.getConfidentialNotes() != null && canUpdateColumn("confidentialNotes", visibleColumns)) {
             entity.setConfidentialNotes(request.getConfidentialNotes());
         }
         if (request.getFinancialData() != null && canUpdateColumn("financialData", visibleColumns)) {
             entity.setFinancialData(request.getFinancialData());
+        }
+        if (request.getMetadata() != null && canUpdateColumn("metadata", visibleColumns)) {
+            entity.setMetadata(request.getMetadata());
         }
 
         // Save
@@ -218,7 +215,7 @@ public class MyDataService {
      */
     @Transactional
     public void delete(
-            UUID id,
+            Long id,
             SecurityContext securityContext,
             HttpServletRequest httpRequest) {
 
@@ -238,8 +235,8 @@ public class MyDataService {
         }
 
         // Soft delete
-        entity.setIsDeleted(true);
-        entity.setDeletedAt(LocalDateTime.now());
+        entity.setDeleted(true);
+        entity.setDeletedAt(OffsetDateTime.now());
         entity.setDeletedBy(securityContext.getUserId());
 
         myDataRepository.save(entity);
@@ -263,8 +260,8 @@ public class MyDataService {
 
         Page<MyData> page = myDataRepository.findAccessibleByUser(
             securityContext.getUserId(),
-            securityContext.getDepartmentId(),
-            securityContext.getTeamId(),
+            securityContext.getDepartment(),
+            securityContext.getTeam(),
             securityContext.isExecutive(),
             pageable
         );
@@ -294,9 +291,9 @@ public class MyDataService {
 
         return myDataRepository.findByOwnerId(ownerId).stream()
             .map(MyDataDto.Summary::fromEntity)
-            .collect(java.util.stream.Collectors.collectingAndThen(
-                java.util.stream.Collectors.toList(),
-                list -> new org.springframework.data.domain.PageImpl<>(list, pageable, list.size())
+            .collect(Collectors.collectingAndThen(
+                Collectors.toList(),
+                list -> new PageImpl<>(list, pageable, list.size())
             ));
     }
 
@@ -312,8 +309,8 @@ public class MyDataService {
         // Get accessible data and filter by name
         Page<MyData> accessibleData = myDataRepository.findAccessibleByUser(
             securityContext.getUserId(),
-            securityContext.getDepartmentId(),
-            securityContext.getTeamId(),
+            securityContext.getDepartment(),
+            securityContext.getTeam(),
             securityContext.isExecutive(),
             pageable
         );
@@ -343,15 +340,16 @@ public class MyDataService {
         return MyData.builder()
             .id(entity.getId())
             .name(entity.getName())
-            .dataDate(entity.getDataDate())
+            .date(entity.getDate())
             .data(entity.getData())
             .sensitivityLevel(entity.getSensitivityLevel())
             .organizationLevel(entity.getOrganizationLevel())
-            .departmentId(entity.getDepartmentId())
-            .teamId(entity.getTeamId())
+            .ownerDepartment(entity.getOwnerDepartment())
+            .ownerTeam(entity.getOwnerTeam())
             .ownerId(entity.getOwnerId())
             .confidentialNotes(entity.getConfidentialNotes())
             .financialData(entity.getFinancialData())
+            .metadata(entity.getMetadata())
             .createdAt(entity.getCreatedAt())
             .createdBy(entity.getCreatedBy())
             .updatedAt(entity.getUpdatedAt())

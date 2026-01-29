@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+
 
 /**
  * Admin Controller for managing access control rules, user attributes, and viewing audit logs.
@@ -70,7 +70,7 @@ public class AdminController {
      */
     @GetMapping("/access-rules/{id}")
     @Operation(summary = "Get access control rule by ID")
-    public ResponseEntity<DataAccessControl> getAccessRule(@PathVariable UUID id) {
+    public ResponseEntity<DataAccessControl> getAccessRule(@PathVariable Long id) {
         return accessControlRepository.findById(id)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
@@ -82,7 +82,7 @@ public class AdminController {
     @PutMapping("/access-rules/{id}")
     @Operation(summary = "Update access control rule")
     public ResponseEntity<DataAccessControl> updateAccessRule(
-            @PathVariable UUID id,
+            @PathVariable Long id,
             @RequestBody DataAccessControl rule) {
         return accessControlRepository.findById(id)
             .map(existing -> {
@@ -99,7 +99,7 @@ public class AdminController {
      */
     @DeleteMapping("/access-rules/{id}")
     @Operation(summary = "Delete access control rule")
-    public ResponseEntity<Void> deleteAccessRule(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteAccessRule(@PathVariable Long id) {
         if (accessControlRepository.existsById(id)) {
             accessControlRepository.deleteById(id);
             return ResponseEntity.noContent().build();
@@ -176,7 +176,7 @@ public class AdminController {
     public ResponseEntity<List<UserAttribute>> getUsersByDepartment(
             @PathVariable String departmentId) {
         return ResponseEntity.ok(
-            userAttributeRepository.findByDepartmentIdAndIsActiveTrue(departmentId));
+            userAttributeRepository.findByDepartmentAndActiveTrue(departmentId));
     }
 
     /**
@@ -186,7 +186,7 @@ public class AdminController {
     @Operation(summary = "Get users in a team")
     public ResponseEntity<List<UserAttribute>> getUsersByTeam(@PathVariable String teamId) {
         return ResponseEntity.ok(
-            userAttributeRepository.findByTeamIdAndIsActiveTrue(teamId));
+            userAttributeRepository.findByTeamAndActiveTrue(teamId));
     }
 
     /**
@@ -195,7 +195,7 @@ public class AdminController {
     @GetMapping("/user-attributes/executives")
     @Operation(summary = "Get all executives")
     public ResponseEntity<List<UserAttribute>> getExecutives() {
-        return ResponseEntity.ok(userAttributeRepository.findByIsExecutiveTrueAndIsActiveTrue());
+        return ResponseEntity.ok(userAttributeRepository.findByIsExecutiveTrueAndActiveTrue());
     }
 
     /**
@@ -206,7 +206,7 @@ public class AdminController {
     public ResponseEntity<List<UserAttribute>> getUsersByClearance(
             @PathVariable UserAttribute.ClearanceLevel level) {
         return ResponseEntity.ok(
-            userAttributeRepository.findByClearanceLevelAndIsActiveTrue(level));
+            userAttributeRepository.findByClearanceLevelAndActiveTrue(level));
     }
 
     // ==================== Audit Log Viewing ====================

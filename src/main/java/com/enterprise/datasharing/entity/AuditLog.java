@@ -4,20 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 /**
  * Comprehensive audit log entity that tracks all data access and modifications.
  * Captures who, what, when, where, and how for security compliance.
  */
 @Entity
-@Table(name = "audit_log", indexes = {
-    @Index(name = "idx_audit_user_id", columnList = "user_id"),
-    @Index(name = "idx_audit_action", columnList = "action"),
-    @Index(name = "idx_audit_entity", columnList = "entity_type, entity_id"),
-    @Index(name = "idx_audit_timestamp", columnList = "timestamp"),
-    @Index(name = "idx_audit_correlation", columnList = "correlation_id")
-})
+@Table(name = "audit_log")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,8 +18,9 @@ import java.util.UUID;
 public class AuditLog {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
     // Who
     @Column(name = "user_id", nullable = false)
@@ -35,21 +29,21 @@ public class AuditLog {
     @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "user_roles")
+    @Column(name = "user_roles", length = 500)
     private String userRoles;
 
-    @Column(name = "user_department")
+    @Column(name = "user_department", length = 100)
     private String userDepartment;
 
-    @Column(name = "user_team")
+    @Column(name = "user_team", length = 100)
     private String userTeam;
 
     // What
     @Enumerated(EnumType.STRING)
-    @Column(name = "action", nullable = false)
+    @Column(name = "action", nullable = false, length = 50)
     private AuditAction action;
 
-    @Column(name = "entity_type", nullable = false)
+    @Column(name = "entity_type", nullable = false, length = 100)
     private String entityType;
 
     @Column(name = "entity_id")
@@ -69,28 +63,28 @@ public class AuditLog {
     private LocalDateTime timestamp;
 
     // Where (Context)
-    @Column(name = "ip_address")
+    @Column(name = "ip_address", length = 45)
     private String ipAddress;
 
-    @Column(name = "user_agent")
+    @Column(name = "user_agent", columnDefinition = "TEXT")
     private String userAgent;
 
-    @Column(name = "request_uri")
+    @Column(name = "request_uri", length = 1000)
     private String requestUri;
 
-    @Column(name = "http_method")
+    @Column(name = "http_method", length = 10)
     private String httpMethod;
 
     // How (Access Control Decision)
     @Enumerated(EnumType.STRING)
-    @Column(name = "access_decision")
+    @Column(name = "access_decision", length = 50)
     private AccessDecision accessDecision;
 
     @Column(name = "access_reason", columnDefinition = "TEXT")
     private String accessReason;
 
     // RBAC info
-    @Column(name = "required_role")
+    @Column(name = "required_role", length = 100)
     private String requiredRole;
 
     // ABAC info
@@ -102,7 +96,7 @@ public class AuditLog {
     private String contextConditions;
 
     // Correlation for request tracing
-    @Column(name = "correlation_id")
+    @Column(name = "correlation_id", length = 100)
     private String correlationId;
 
     @Column(name = "session_id")
@@ -110,13 +104,14 @@ public class AuditLog {
 
     // Result
     @Column(name = "success", nullable = false)
-    private Boolean success;
+    @Builder.Default
+    private Boolean success = true;
 
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 
     // Data hash for integrity verification
-    @Column(name = "data_hash")
+    @Column(name = "data_hash", length = 64)
     private String dataHash;
 
     /**

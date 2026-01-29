@@ -21,7 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+
 
 /**
  * REST Controller for MyData CRUD operations.
@@ -78,7 +78,7 @@ public class MyDataController {
     })
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<MyDataDto.Response> findById(
-            @Parameter(description = "Data entry ID") @PathVariable UUID id,
+            @Parameter(description = "Data entry ID") @PathVariable Long id,
             HttpServletRequest httpRequest) {
 
         SecurityContext context = SecurityContext.fromCurrentContext();
@@ -106,7 +106,7 @@ public class MyDataController {
     })
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<MyDataDto.Response> update(
-            @Parameter(description = "Data entry ID") @PathVariable UUID id,
+            @Parameter(description = "Data entry ID") @PathVariable Long id,
             @Valid @RequestBody MyDataDto.UpdateRequest request,
             HttpServletRequest httpRequest) {
 
@@ -135,7 +135,7 @@ public class MyDataController {
     })
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<MyDataDto.Response> partialUpdate(
-            @Parameter(description = "Data entry ID") @PathVariable UUID id,
+            @Parameter(description = "Data entry ID") @PathVariable Long id,
             @RequestBody MyDataDto.UpdateRequest request,
             HttpServletRequest httpRequest) {
 
@@ -163,7 +163,7 @@ public class MyDataController {
     })
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> delete(
-            @Parameter(description = "Data entry ID") @PathVariable UUID id,
+            @Parameter(description = "Data entry ID") @PathVariable Long id,
             HttpServletRequest httpRequest) {
 
         SecurityContext context = SecurityContext.fromCurrentContext();

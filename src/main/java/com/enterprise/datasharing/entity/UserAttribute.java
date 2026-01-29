@@ -6,8 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
+import java.time.OffsetDateTime;
 
 /**
  * User Attribute entity for ABAC (Attribute-Based Access Control).
@@ -15,10 +14,10 @@ import java.util.UUID;
  * These attributes are used to make access control decisions.
  */
 @Entity
-@Table(name = "user_attributes", indexes = {
+@Table(name = "user_attribute", indexes = {
     @Index(name = "idx_user_attr_user_id", columnList = "user_id", unique = true),
-    @Index(name = "idx_user_attr_department", columnList = "department_id"),
-    @Index(name = "idx_user_attr_team", columnList = "team_id"),
+    @Index(name = "idx_user_attr_department", columnList = "department"),
+    @Index(name = "idx_user_attr_team", columnList = "team"),
     @Index(name = "idx_user_attr_clearance", columnList = "clearance_level")
 })
 @EntityListeners(AuditingEntityListener.class)
@@ -29,8 +28,8 @@ import java.util.UUID;
 public class UserAttribute {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "user_id", nullable = false, unique = true)
     private String userId;
@@ -42,29 +41,23 @@ public class UserAttribute {
     private String email;
 
     // Organizational hierarchy
-    @Column(name = "department_id")
-    private String departmentId;
+    @Column(name = "department", length = 100)
+    private String department;
 
-    @Column(name = "department_name")
-    private String departmentName;
-
-    @Column(name = "team_id")
-    private String teamId;
-
-    @Column(name = "team_name")
-    private String teamName;
-
-    // Organization level (for RBAC)
-    @Enumerated(EnumType.STRING)
-    @Column(name = "organization_level", nullable = false)
-    @Builder.Default
-    private OrganizationLevel organizationLevel = OrganizationLevel.INDIVIDUAL;
+    @Column(name = "team", length = 100)
+    private String team;
 
     // Clearance levels (for ABAC)
     @Enumerated(EnumType.STRING)
-    @Column(name = "clearance_level", nullable = false)
+    @Column(name = "clearance_level", nullable = false, columnDefinition = "VARCHAR(50)")
     @Builder.Default
     private ClearanceLevel clearanceLevel = ClearanceLevel.PUBLIC;
+
+    // Organization level (for RBAC)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "organization_level", nullable = false, columnDefinition = "VARCHAR(50)")
+    @Builder.Default
+    private OrganizationLevel organizationLevel = OrganizationLevel.INDIVIDUAL;
 
     // Manager hierarchy
     @Column(name = "manager_id")
@@ -82,42 +75,32 @@ public class UserAttribute {
     @Builder.Default
     private Boolean isExecutive = false;
 
-    // Employment details
-    @Column(name = "employee_type")
-    private String employeeType;  // FULL_TIME, CONTRACTOR, etc.
-
-    @Column(name = "hire_date")
-    private LocalDateTime hireDate;
-
-    // Additional custom attributes (JSON)
-    @Column(name = "custom_attributes", columnDefinition = "TEXT")
-    private String customAttributes;
-
-    // Status
-    @Column(name = "is_active", nullable = false)
-    @Builder.Default
-    private Boolean isActive = true;
+    // Additional custom attributes (JSON string)
+    @Column(name = "attributes", columnDefinition = "TEXT")
+    private String attributes;
 
     // Audit fields
     @CreatedDate
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "created_at", updatable = false)
+    private OffsetDateTime createdAt;
 
     @LastModifiedDate
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
-    @Version
-    private Long version;
+    // Status
+    @Column(name = "active")
+    @Builder.Default
+    private Boolean active = true;
 
     /**
      * Organization levels for hierarchy-based access
      */
     public enum OrganizationLevel {
-        EXECUTIVE,          // C-level, VP, Director
-        DEPARTMENT_MANAGER, // Department/Division head
-        TEAM_LEAD,          // Team lead/supervisor
-        INDIVIDUAL          // Regular employee
+        EXECUTIVE,      // C-level, VP, Director
+        DEPARTMENT,     // Department/Division head
+        TEAM,           // Team lead/supervisor
+        INDIVIDUAL      // Regular employee
     }
 
     /**

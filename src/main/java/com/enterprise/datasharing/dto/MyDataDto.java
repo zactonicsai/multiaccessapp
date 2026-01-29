@@ -8,9 +8,8 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Data Transfer Objects for MyData entity
@@ -29,8 +28,8 @@ public class MyDataDto {
         @Size(max = 255, message = "Name must be less than 255 characters")
         private String name;
 
-        @NotNull(message = "Data date is required")
-        private LocalDate dataDate;
+        @NotNull(message = "Date is required")
+        private LocalDate date;
 
         @Size(max = 10000, message = "Data must be less than 10000 characters")
         private String data;
@@ -40,14 +39,12 @@ public class MyDataDto {
 
         private MyData.SensitivityLevel sensitivityLevel;
 
-        private String departmentId;
-
-        private String teamId;
-
         // Optional confidential fields (require appropriate clearance)
         private String confidentialNotes;
 
         private String financialData;
+
+        private String metadata;
     }
 
     /**
@@ -61,7 +58,7 @@ public class MyDataDto {
         @Size(max = 255, message = "Name must be less than 255 characters")
         private String name;
 
-        private LocalDate dataDate;
+        private LocalDate date;
 
         @Size(max = 10000, message = "Data must be less than 10000 characters")
         private String data;
@@ -70,13 +67,11 @@ public class MyDataDto {
 
         private MyData.SensitivityLevel sensitivityLevel;
 
-        private String departmentId;
-
-        private String teamId;
-
         private String confidentialNotes;
 
         private String financialData;
+
+        private String metadata;
     }
 
     /**
@@ -88,24 +83,25 @@ public class MyDataDto {
     @Builder
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public static class Response {
-        private UUID id;
+        private Long id;
         private String name;
-        private LocalDate dataDate;
+        private LocalDate date;
         private String data;
         private MyData.SensitivityLevel sensitivityLevel;
         private MyData.OrganizationLevel organizationLevel;
-        private String departmentId;
-        private String teamId;
+        private String ownerDepartment;
+        private String ownerTeam;
         private String ownerId;
         
         // Sensitive fields - may be null based on clearance
         private String confidentialNotes;
         private String financialData;
+        private String metadata;
 
         // Audit info
-        private LocalDateTime createdAt;
+        private OffsetDateTime createdAt;
         private String createdBy;
-        private LocalDateTime updatedAt;
+        private OffsetDateTime updatedAt;
         private String updatedBy;
 
         // Access info
@@ -125,8 +121,8 @@ public class MyDataDto {
             if (visibleColumns == null || visibleColumns.contains("name")) {
                 builder.name(entity.getName());
             }
-            if (visibleColumns == null || visibleColumns.contains("dataDate")) {
-                builder.dataDate(entity.getDataDate());
+            if (visibleColumns == null || visibleColumns.contains("date")) {
+                builder.date(entity.getDate());
             }
             if (visibleColumns == null || visibleColumns.contains("data")) {
                 builder.data(entity.getData());
@@ -137,11 +133,11 @@ public class MyDataDto {
             if (visibleColumns == null || visibleColumns.contains("organizationLevel")) {
                 builder.organizationLevel(entity.getOrganizationLevel());
             }
-            if (visibleColumns == null || visibleColumns.contains("departmentId")) {
-                builder.departmentId(entity.getDepartmentId());
+            if (visibleColumns == null || visibleColumns.contains("ownerDepartment")) {
+                builder.ownerDepartment(entity.getOwnerDepartment());
             }
-            if (visibleColumns == null || visibleColumns.contains("teamId")) {
-                builder.teamId(entity.getTeamId());
+            if (visibleColumns == null || visibleColumns.contains("ownerTeam")) {
+                builder.ownerTeam(entity.getOwnerTeam());
             }
             if (visibleColumns == null || visibleColumns.contains("ownerId")) {
                 builder.ownerId(entity.getOwnerId());
@@ -151,6 +147,9 @@ public class MyDataDto {
             }
             if (visibleColumns == null || visibleColumns.contains("financialData")) {
                 builder.financialData(entity.getFinancialData());
+            }
+            if (visibleColumns == null || visibleColumns.contains("metadata")) {
+                builder.metadata(entity.getMetadata());
             }
             if (visibleColumns == null || visibleColumns.contains("createdAt")) {
                 builder.createdAt(entity.getCreatedAt());
@@ -184,24 +183,24 @@ public class MyDataDto {
     @AllArgsConstructor
     @Builder
     public static class Summary {
-        private UUID id;
+        private Long id;
         private String name;
-        private LocalDate dataDate;
+        private LocalDate date;
         private MyData.SensitivityLevel sensitivityLevel;
         private MyData.OrganizationLevel organizationLevel;
-        private String departmentId;
-        private String teamId;
-        private LocalDateTime createdAt;
+        private String ownerDepartment;
+        private String ownerTeam;
+        private OffsetDateTime createdAt;
 
         public static Summary fromEntity(MyData entity) {
             return Summary.builder()
                 .id(entity.getId())
                 .name(entity.getName())
-                .dataDate(entity.getDataDate())
+                .date(entity.getDate())
                 .sensitivityLevel(entity.getSensitivityLevel())
                 .organizationLevel(entity.getOrganizationLevel())
-                .departmentId(entity.getDepartmentId())
-                .teamId(entity.getTeamId())
+                .ownerDepartment(entity.getOwnerDepartment())
+                .ownerTeam(entity.getOwnerTeam())
                 .createdAt(entity.getCreatedAt())
                 .build();
         }

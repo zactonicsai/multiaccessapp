@@ -6,59 +6,54 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Repository for DataAccessControl entity.
  * Provides queries for evaluating access control rules.
  */
 @Repository
-public interface DataAccessControlRepository extends JpaRepository<DataAccessControl, UUID> {
+public interface DataAccessControlRepository extends JpaRepository<DataAccessControl, Long> {
 
     /**
-     * Find all active rules for an entity
+     * Find all active rules for a data record
      */
     @Query("""
         SELECT d FROM DataAccessControl d 
-        WHERE d.entityType = :entityType 
-        AND (d.entityId = :entityId OR d.entityId IS NULL)
-        AND d.isActive = true
+        WHERE (d.dataId = :dataId OR d.dataId IS NULL)
+        AND d.active = true
         AND (d.validFrom IS NULL OR d.validFrom <= :now)
         AND (d.validUntil IS NULL OR d.validUntil >= :now)
-        ORDER BY d.priority ASC
+        ORDER BY d.priority DESC
         """)
-    List<DataAccessControl> findActiveRulesForEntity(
-        @Param("entityType") String entityType,
-        @Param("entityId") String entityId,
-        @Param("now") LocalDateTime now
+    List<DataAccessControl> findActiveRulesForData(
+        @Param("dataId") Long dataId,
+        @Param("now") OffsetDateTime now
     );
 
     /**
-     * Find active rules for entity (using current time)
+     * Find active rules for data (using current time)
      */
-    default List<DataAccessControl> findActiveRulesForEntity(String entityType, String entityId) {
-        return findActiveRulesForEntity(entityType, entityId, LocalDateTime.now());
+    default List<DataAccessControl> findActiveRulesForData(Long dataId) {
+        return findActiveRulesForData(dataId, OffsetDateTime.now());
     }
 
     /**
-     * Find row-level rules for a specific user and entity
+     * Find row-level rules for a specific user and data
      */
     @Query("""
         SELECT d FROM DataAccessControl d 
-        WHERE d.entityType = :entityType 
-        AND d.entityId = :entityId
-        AND d.isActive = true
+        WHERE d.dataId = :dataId
+        AND d.active = true
         AND (
-            (d.principalType = 'USER' AND d.principalId = :userId)
+            (d.principalType = 'USER' AND d.principalValue = :userId)
             OR d.principalType = 'ALL'
         )
-        ORDER BY d.priority ASC
+        ORDER BY d.priority DESC
         """)
     List<DataAccessControl> findRowLevelRules(
-        @Param("entityType") String entityType,
-        @Param("entityId") String entityId,
+        @Param("dataId") Long dataId,
         @Param("userId") String userId
     );
 
@@ -67,50 +62,56 @@ public interface DataAccessControlRepository extends JpaRepository<DataAccessCon
      */
     @Query("""
         SELECT d FROM DataAccessControl d 
-        WHERE d.entityType = :entityType 
-        AND d.isActive = true
-        AND (d.allowedColumns IS NOT NULL OR d.deniedColumns IS NOT NULL)
+        WHERE d.active = true
+        AND d.visibleColumns IS NOT NULL
         AND (
-            (d.principalType = 'USER' AND d.principalId = :userId)
+            (d.principalType = 'USER' AND d.principalValue = :userId)
             OR d.principalType = 'ALL'
         )
-        ORDER BY d.priority ASC
+        ORDER BY d.priority DESC
         """)
     List<DataAccessControl> findColumnLevelRules(
-        @Param("entityType") String entityType,
         @Param("userId") String userId
     );
 
     /**
-     * Find rules by principal type and ID
+     * Find rules by principal type and value
      */
-    List<DataAccessControl> findByPrincipalTypeAndPrincipalIdAndIsActiveTrue(
+    List<DataAccessControl> findByPrincipalTypeAndPrincipalValueAndActiveTrue(
         DataAccessControl.PrincipalType principalType,
-        String principalId
+        String principalValue
     );
 
     /**
      * Find rules for a role
      */
     default List<DataAccessControl> findRulesForRole(String role) {
-        return findByPrincipalTypeAndPrincipalIdAndIsActiveTrue(
+        return findByPrincipalTypeAndPrincipalValueAndActiveTrue(
             DataAccessControl.PrincipalType.ROLE, role);
     }
 
     /**
      * Find rules for a department
      */
-    default List<DataAccessControl> findRulesForDepartment(String departmentId) {
-        return findByPrincipalTypeAndPrincipalIdAndIsActiveTrue(
-            DataAccessControl.PrincipalType.DEPARTMENT, departmentId);
+    default List<DataAccessControl> findRulesForDepartment(String department) {
+        return findByPrincipalTypeAndPrincipalValueAndActiveTrue(
+            DataAccessControl.PrincipalType.DEPARTMENT, department);
     }
 
     /**
      * Find rules for a team
      */
-    default List<DataAccessControl> findRulesForTeam(String teamId) {
-        return findByPrincipalTypeAndPrincipalIdAndIsActiveTrue(
-            DataAccessControl.PrincipalType.TEAM, teamId);
+    default List<DataAccessControl> findRulesForTeam(String team) {
+        return findByPrincipalTypeAndPrincipalValueAndActiveTrue(
+            DataAccessControl.PrincipalType.TEAM, team);
+    }
+
+    /**
+     * Find rules for a clearance level
+     */
+    default List<DataAccessControl> findRulesForClearance(String clearance) {
+        return findByPrincipalTypeAndPrincipalValueAndActiveTrue(
+            DataAccessControl.PrincipalType.CLEARANCE, clearance);
     }
 
     /**
@@ -119,8 +120,13 @@ public interface DataAccessControlRepository extends JpaRepository<DataAccessCon
     List<DataAccessControl> findByCreatedByOrderByCreatedAtDesc(String createdBy);
 
     /**
+     * Find all active rules
+     */
+    List<DataAccessControl> findByActiveTrueOrderByPriorityDesc();
+
+    /**
      * Find expired rules
      */
-    @Query("SELECT d FROM DataAccessControl d WHERE d.validUntil < :now AND d.isActive = true")
-    List<DataAccessControl> findExpiredRules(@Param("now") LocalDateTime now);
+    @Query("SELECT d FROM DataAccessControl d WHERE d.validUntil < :now AND d.active = true")
+    List<DataAccessControl> findExpiredRules(@Param("now") OffsetDateTime now);
 }
