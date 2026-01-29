@@ -1,0 +1,1006 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-insert-executive-user
+      author: enterprise-datasharing
+      comment: Insert executive user (CEO)
+      context: "!prod"
+      changes:
+        - insert:
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: user_id
+                  value: exec-001
+              - column:
+                  name: username
+                  value: john.ceo
+              - column:
+                  name: email
+                  value: john.ceo@enterprise.com
+              - column:
+                  name: department
+                  value: EXECUTIVE
+              - column:
+                  name: team
+                  value: LEADERSHIP
+              - column:
+                  name: clearance_level
+                  value: TOP_SECRET
+              - column:
+                  name: organization_level
+                  value: EXECUTIVE
+              - column:
+                  name: is_manager
+                  valueBoolean: true
+              - column:
+                  name: is_department_head
+                  valueBoolean: true
+              - column:
+                  name: is_executive
+                  valueBoolean: true
+
+  - changeSet:
+      id: 008-insert-department-heads
+      author: enterprise-datasharing
+      comment: Insert department head users
+      context: "!prod"
+      changes:
+        - insert:
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: user_id
+                  value: dept-eng-001
+              - column:
+                  name: username
+                  value: sarah.engineering
+              - column:
+                  name: email
+                  value: sarah.engineering@enterprise.com
+              - column:
+                  name: department
+                  value: ENGINEERING
+              - column:
+                  name: team
+                  value: MANAGEMENT
+              - column:
+                  name: clearance_level
+                  value: SECRET
+              - column:
+                  name: organization_level
+                  value: DEPARTMENT
+              - column:
+                  name: manager_id
+                  value: exec-001
+              - column:
+                  name: is_manager
+                  valueBoolean: true
+              - column:
+                  name: is_department_head
+                  valueBoolean: true
+        - insert:
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: user_id
+                  value: dept-sales-001
+              - column:
+                  name: username
+                  value: mike.sales
+              - column:
+                  name: email
+                  value: mike.sales@enterprise.com
+              - column:
+                  name: department
+                  value: SALES
+              - column:
+                  name: team
+                  value: MANAGEMENT
+              - column:
+                  name: clearance_level
+                  value: SECRET
+              - column:
+                  name: organization_level
+                  value: DEPARTMENT
+              - column:
+                  name: manager_id
+                  value: exec-001
+              - column:
+                  name: is_manager
+                  valueBoolean: true
+              - column:
+                  name: is_department_head
+                  valueBoolean: true
+        - insert:
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: user_id
+                  value: dept-hr-001
+              - column:
+                  name: username
+                  value: lisa.hr
+              - column:
+                  name: email
+                  value: lisa.hr@enterprise.com
+              - column:
+                  name: department
+                  value: HR
+              - column:
+                  name: team
+                  value: MANAGEMENT
+              - column:
+                  name: clearance_level
+                  value: SECRET
+              - column:
+                  name: organization_level
+                  value: DEPARTMENT
+              - column:
+                  name: manager_id
+                  value: exec-001
+              - column:
+                  name: is_manager
+                  valueBoolean: true
+              - column:
+                  name: is_department_head
+                  valueBoolean: true
+
+  - changeSet:
+      id: 008-insert-team-leads
+      author: enterprise-datasharing
+      comment: Insert team lead users
+      context: "!prod"
+      changes:
+        - insert:
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: user_id
+                  value: team-backend-001
+              - column:
+                  name: username
+                  value: alice.backend
+              - column:
+                  name: email
+                  value: alice.backend@enterprise.com
+              - column:
+                  name: department
+                  value: ENGINEERING
+              - column:
+                  name: team
+                  value: BACKEND
+              - column:
+                  name: clearance_level
+                  value: CONFIDENTIAL
+              - column:
+                  name: organization_level
+                  value: TEAM
+              - column:
+                  name: manager_id
+                  value: dept-eng-001
+              - column:
+                  name: is_manager
+                  valueBoolean: true
+        - insert:
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: user_id
+                  value: team-frontend-001
+              - column:
+                  name: username
+                  value: bob.frontend
+              - column:
+                  name: email
+                  value: bob.frontend@enterprise.com
+              - column:
+                  name: department
+                  value: ENGINEERING
+              - column:
+                  name: team
+                  value: FRONTEND
+              - column:
+                  name: clearance_level
+                  value: CONFIDENTIAL
+              - column:
+                  name: organization_level
+                  value: TEAM
+              - column:
+                  name: manager_id
+                  value: dept-eng-001
+              - column:
+                  name: is_manager
+                  valueBoolean: true
+        - insert:
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: user_id
+                  value: team-enterprise-001
+              - column:
+                  name: username
+                  value: carol.enterprise
+              - column:
+                  name: email
+                  value: carol.enterprise@enterprise.com
+              - column:
+                  name: department
+                  value: SALES
+              - column:
+                  name: team
+                  value: ENTERPRISE
+              - column:
+                  name: clearance_level
+                  value: CONFIDENTIAL
+              - column:
+                  name: organization_level
+                  value: TEAM
+              - column:
+                  name: manager_id
+                  value: dept-sales-001
+              - column:
+                  name: is_manager
+                  valueBoolean: true
+
+  - changeSet:
+      id: 008-insert-individual-contributors
+      author: enterprise-datasharing
+      comment: Insert individual contributor users
+      context: "!prod"
+      changes:
+        - insert:
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: user_id
+                  value: ind-dev-001
+              - column:
+                  name: username
+                  value: dev.one
+              - column:
+                  name: email
+                  value: dev.one@enterprise.com
+              - column:
+                  name: department
+                  value: ENGINEERING
+              - column:
+                  name: team
+                  value: BACKEND
+              - column:
+                  name: clearance_level
+                  value: INTERNAL
+              - column:
+                  name: organization_level
+                  value: INDIVIDUAL
+              - column:
+                  name: manager_id
+                  value: team-backend-001
+        - insert:
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: user_id
+                  value: ind-dev-002
+              - column:
+                  name: username
+                  value: dev.two
+              - column:
+                  name: email
+                  value: dev.two@enterprise.com
+              - column:
+                  name: department
+                  value: ENGINEERING
+              - column:
+                  name: team
+                  value: BACKEND
+              - column:
+                  name: clearance_level
+                  value: INTERNAL
+              - column:
+                  name: organization_level
+                  value: INDIVIDUAL
+              - column:
+                  name: manager_id
+                  value: team-backend-001
+        - insert:
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: user_id
+                  value: ind-dev-003
+              - column:
+                  name: username
+                  value: dev.three
+              - column:
+                  name: email
+                  value: dev.three@enterprise.com
+              - column:
+                  name: department
+                  value: ENGINEERING
+              - column:
+                  name: team
+                  value: FRONTEND
+              - column:
+                  name: clearance_level
+                  value: INTERNAL
+              - column:
+                  name: organization_level
+                  value: INDIVIDUAL
+              - column:
+                  name: manager_id
+                  value: team-frontend-001
+        - insert:
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: user_id
+                  value: ind-sales-001
+              - column:
+                  name: username
+                  value: sales.one
+              - column:
+                  name: email
+                  value: sales.one@enterprise.com
+              - column:
+                  name: department
+                  value: SALES
+              - column:
+                  name: team
+                  value: ENTERPRISE
+              - column:
+                  name: clearance_level
+                  value: INTERNAL
+              - column:
+                  name: organization_level
+                  value: INDIVIDUAL
+              - column:
+                  name: manager_id
+                  value: team-enterprise-001
+        - insert:
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: user_id
+                  value: ind-hr-001
+              - column:
+                  name: username
+                  value: hr.specialist
+              - column:
+                  name: email
+                  value: hr.specialist@enterprise.com
+              - column:
+                  name: department
+                  value: HR
+              - column:
+                  name: team
+                  value: RECRUITING
+              - column:
+                  name: clearance_level
+                  value: CONFIDENTIAL
+              - column:
+                  name: organization_level
+                  value: INDIVIDUAL
+              - column:
+                  name: manager_id
+                  value: dept-hr-001
+
+  - changeSet:
+      id: 008-insert-executive-data
+      author: enterprise-datasharing
+      comment: Insert executive level sample data records
+      context: "!prod"
+      changes:
+        - insert:
+            tableName: my_data
+            columns:
+              - column:
+                  name: name
+                  value: Q4 Strategic Plan
+              - column:
+                  name: date
+                  valueDate: 2024-01-15
+              - column:
+                  name: data
+                  value: Company-wide strategic initiatives for Q4
+              - column:
+                  name: sensitivity_level
+                  value: RESTRICTED
+              - column:
+                  name: organization_level
+                  value: EXECUTIVE
+              - column:
+                  name: owner_id
+                  value: exec-001
+              - column:
+                  name: owner_department
+                  value: EXECUTIVE
+              - column:
+                  name: owner_team
+                  value: LEADERSHIP
+              - column:
+                  name: confidential_notes
+                  value: Confidential merger discussions
+              - column:
+                  name: financial_data
+                  value: '{"revenue_target": 50000000, "budget": 10000000}'
+              - column:
+                  name: created_by
+                  value: exec-001
+        - insert:
+            tableName: my_data
+            columns:
+              - column:
+                  name: name
+                  value: Annual Board Report
+              - column:
+                  name: date
+                  valueDate: 2024-01-01
+              - column:
+                  name: data
+                  value: Annual performance report for board review
+              - column:
+                  name: sensitivity_level
+                  value: RESTRICTED
+              - column:
+                  name: organization_level
+                  value: EXECUTIVE
+              - column:
+                  name: owner_id
+                  value: exec-001
+              - column:
+                  name: owner_department
+                  value: EXECUTIVE
+              - column:
+                  name: owner_team
+                  value: LEADERSHIP
+              - column:
+                  name: confidential_notes
+                  value: Executive compensation details
+              - column:
+                  name: financial_data
+                  value: '{"profit": 15000000, "growth": 0.25}'
+              - column:
+                  name: created_by
+                  value: exec-001
+
+  - changeSet:
+      id: 008-insert-department-data
+      author: enterprise-datasharing
+      comment: Insert department level sample data records
+      context: "!prod"
+      changes:
+        - insert:
+            tableName: my_data
+            columns:
+              - column:
+                  name: name
+                  value: Engineering Roadmap 2024
+              - column:
+                  name: date
+                  valueDate: 2024-01-10
+              - column:
+                  name: data
+                  value: Technical roadmap and priorities for Engineering department
+              - column:
+                  name: sensitivity_level
+                  value: CONFIDENTIAL
+              - column:
+                  name: organization_level
+                  value: DEPARTMENT
+              - column:
+                  name: owner_id
+                  value: dept-eng-001
+              - column:
+                  name: owner_department
+                  value: ENGINEERING
+              - column:
+                  name: owner_team
+                  value: MANAGEMENT
+              - column:
+                  name: confidential_notes
+                  value: Planned tech stack migration
+              - column:
+                  name: financial_data
+                  value: '{"budget": 2000000}'
+              - column:
+                  name: created_by
+                  value: dept-eng-001
+        - insert:
+            tableName: my_data
+            columns:
+              - column:
+                  name: name
+                  value: Sales Pipeline Q1
+              - column:
+                  name: date
+                  valueDate: 2024-01-05
+              - column:
+                  name: data
+                  value: Q1 sales pipeline and forecast
+              - column:
+                  name: sensitivity_level
+                  value: CONFIDENTIAL
+              - column:
+                  name: organization_level
+                  value: DEPARTMENT
+              - column:
+                  name: owner_id
+                  value: dept-sales-001
+              - column:
+                  name: owner_department
+                  value: SALES
+              - column:
+                  name: owner_team
+                  value: MANAGEMENT
+              - column:
+                  name: confidential_notes
+                  value: Key account negotiations
+              - column:
+                  name: financial_data
+                  value: '{"pipeline_value": 8000000, "expected_close": 5000000}'
+              - column:
+                  name: created_by
+                  value: dept-sales-001
+        - insert:
+            tableName: my_data
+            columns:
+              - column:
+                  name: name
+                  value: HR Policy Updates
+              - column:
+                  name: date
+                  valueDate: 2024-01-08
+              - column:
+                  name: data
+                  value: Updated HR policies for 2024
+              - column:
+                  name: sensitivity_level
+                  value: INTERNAL
+              - column:
+                  name: organization_level
+                  value: DEPARTMENT
+              - column:
+                  name: owner_id
+                  value: dept-hr-001
+              - column:
+                  name: owner_department
+                  value: HR
+              - column:
+                  name: owner_team
+                  value: MANAGEMENT
+              - column:
+                  name: confidential_notes
+                  value: Salary band adjustments
+              - column:
+                  name: financial_data
+                  value: '{"training_budget": 500000}'
+              - column:
+                  name: created_by
+                  value: dept-hr-001
+
+  - changeSet:
+      id: 008-insert-team-data
+      author: enterprise-datasharing
+      comment: Insert team level sample data records
+      context: "!prod"
+      changes:
+        - insert:
+            tableName: my_data
+            columns:
+              - column:
+                  name: name
+                  value: Backend Architecture Review
+              - column:
+                  name: date
+                  valueDate: 2024-01-12
+              - column:
+                  name: data
+                  value: Microservices architecture review and recommendations
+              - column:
+                  name: sensitivity_level
+                  value: INTERNAL
+              - column:
+                  name: organization_level
+                  value: TEAM
+              - column:
+                  name: owner_id
+                  value: team-backend-001
+              - column:
+                  name: owner_department
+                  value: ENGINEERING
+              - column:
+                  name: owner_team
+                  value: BACKEND
+              - column:
+                  name: confidential_notes
+                  value: Security vulnerability assessment
+              - column:
+                  name: created_by
+                  value: team-backend-001
+        - insert:
+            tableName: my_data
+            columns:
+              - column:
+                  name: name
+                  value: Frontend Performance Report
+              - column:
+                  name: date
+                  valueDate: 2024-01-11
+              - column:
+                  name: data
+                  value: UI performance metrics and optimization plan
+              - column:
+                  name: sensitivity_level
+                  value: INTERNAL
+              - column:
+                  name: organization_level
+                  value: TEAM
+              - column:
+                  name: owner_id
+                  value: team-frontend-001
+              - column:
+                  name: owner_department
+                  value: ENGINEERING
+              - column:
+                  name: owner_team
+                  value: FRONTEND
+              - column:
+                  name: created_by
+                  value: team-frontend-001
+        - insert:
+            tableName: my_data
+            columns:
+              - column:
+                  name: name
+                  value: Enterprise Sales Strategy
+              - column:
+                  name: date
+                  valueDate: 2024-01-09
+              - column:
+                  name: data
+                  value: Strategy for enterprise client acquisition
+              - column:
+                  name: sensitivity_level
+                  value: CONFIDENTIAL
+              - column:
+                  name: organization_level
+                  value: TEAM
+              - column:
+                  name: owner_id
+                  value: team-enterprise-001
+              - column:
+                  name: owner_department
+                  value: SALES
+              - column:
+                  name: owner_team
+                  value: ENTERPRISE
+              - column:
+                  name: confidential_notes
+                  value: Competitor pricing intel
+              - column:
+                  name: created_by
+                  value: team-enterprise-001
+
+  - changeSet:
+      id: 008-insert-individual-data
+      author: enterprise-datasharing
+      comment: Insert individual level sample data records
+      context: "!prod"
+      changes:
+        - insert:
+            tableName: my_data
+            columns:
+              - column:
+                  name: name
+                  value: API Integration Notes
+              - column:
+                  name: date
+                  valueDate: 2024-01-14
+              - column:
+                  name: data
+                  value: Personal notes on third-party API integrations
+              - column:
+                  name: sensitivity_level
+                  value: INTERNAL
+              - column:
+                  name: organization_level
+                  value: INDIVIDUAL
+              - column:
+                  name: owner_id
+                  value: ind-dev-001
+              - column:
+                  name: owner_department
+                  value: ENGINEERING
+              - column:
+                  name: owner_team
+                  value: BACKEND
+              - column:
+                  name: created_by
+                  value: ind-dev-001
+        - insert:
+            tableName: my_data
+            columns:
+              - column:
+                  name: name
+                  value: Code Review Checklist
+              - column:
+                  name: date
+                  valueDate: 2024-01-13
+              - column:
+                  name: data
+                  value: Personal code review checklist and guidelines
+              - column:
+                  name: sensitivity_level
+                  value: PUBLIC
+              - column:
+                  name: organization_level
+                  value: INDIVIDUAL
+              - column:
+                  name: owner_id
+                  value: ind-dev-002
+              - column:
+                  name: owner_department
+                  value: ENGINEERING
+              - column:
+                  name: owner_team
+                  value: BACKEND
+              - column:
+                  name: created_by
+                  value: ind-dev-002
+        - insert:
+            tableName: my_data
+            columns:
+              - column:
+                  name: name
+                  value: React Component Library
+              - column:
+                  name: date
+                  valueDate: 2024-01-12
+              - column:
+                  name: data
+                  value: Documentation for reusable React components
+              - column:
+                  name: sensitivity_level
+                  value: PUBLIC
+              - column:
+                  name: organization_level
+                  value: INDIVIDUAL
+              - column:
+                  name: owner_id
+                  value: ind-dev-003
+              - column:
+                  name: owner_department
+                  value: ENGINEERING
+              - column:
+                  name: owner_team
+                  value: FRONTEND
+              - column:
+                  name: created_by
+                  value: ind-dev-003
+        - insert:
+            tableName: my_data
+            columns:
+              - column:
+                  name: name
+                  value: Client Meeting Notes
+              - column:
+                  name: date
+                  valueDate: 2024-01-11
+              - column:
+                  name: data
+                  value: Notes from Acme Corp meeting
+              - column:
+                  name: sensitivity_level
+                  value: CONFIDENTIAL
+              - column:
+                  name: organization_level
+                  value: INDIVIDUAL
+              - column:
+                  name: owner_id
+                  value: ind-sales-001
+              - column:
+                  name: owner_department
+                  value: SALES
+              - column:
+                  name: owner_team
+                  value: ENTERPRISE
+              - column:
+                  name: created_by
+                  value: ind-sales-001
+        - insert:
+            tableName: my_data
+            columns:
+              - column:
+                  name: name
+                  value: Candidate Evaluations
+              - column:
+                  name: date
+                  valueDate: 2024-01-10
+              - column:
+                  name: data
+                  value: Interview evaluations for backend positions
+              - column:
+                  name: sensitivity_level
+                  value: CONFIDENTIAL
+              - column:
+                  name: organization_level
+                  value: INDIVIDUAL
+              - column:
+                  name: owner_id
+                  value: ind-hr-001
+              - column:
+                  name: owner_department
+                  value: HR
+              - column:
+                  name: owner_team
+                  value: RECRUITING
+              - column:
+                  name: created_by
+                  value: ind-hr-001
+
+  - changeSet:
+      id: 008-insert-access-control-rules
+      author: enterprise-datasharing
+      comment: Insert sample access control rules
+      context: "!prod"
+      changes:
+        - insert:
+            tableName: data_access_control
+            columns:
+              - column:
+                  name: rule_name
+                  value: Public Data Access
+              - column:
+                  name: description
+                  value: All users can read public sensitivity data
+              - column:
+                  name: principal_type
+                  value: ALL
+              - column:
+                  name: principal_value
+                  value: '*'
+              - column:
+                  name: can_read
+                  valueBoolean: true
+              - column:
+                  name: visible_columns
+                  value: id,name,date,data,owner_id,created_at
+              - column:
+                  name: priority
+                  valueNumeric: 10
+              - column:
+                  name: created_by
+                  value: system
+        - insert:
+            tableName: data_access_control
+            columns:
+              - column:
+                  name: rule_name
+                  value: HR Financial Access
+              - column:
+                  name: description
+                  value: HR department can see financial data for salary reviews
+              - column:
+                  name: principal_type
+                  value: DEPARTMENT
+              - column:
+                  name: principal_value
+                  value: HR
+              - column:
+                  name: can_read
+                  valueBoolean: true
+              - column:
+                  name: can_update
+                  valueBoolean: false
+              - column:
+                  name: visible_columns
+                  value: id,name,date,data,financial_data,owner_id,created_at
+              - column:
+                  name: priority
+                  valueNumeric: 20
+              - column:
+                  name: created_by
+                  value: system
+        - insert:
+            tableName: data_access_control
+            columns:
+              - column:
+                  name: rule_name
+                  value: Engineering Full Access
+              - column:
+                  name: description
+                  value: Engineering can see technical details
+              - column:
+                  name: principal_type
+                  value: DEPARTMENT
+              - column:
+                  name: principal_value
+                  value: ENGINEERING
+              - column:
+                  name: can_read
+                  valueBoolean: true
+              - column:
+                  name: can_update
+                  valueBoolean: true
+              - column:
+                  name: visible_columns
+                  value: id,name,date,data,metadata,owner_id,owner_team,created_at,updated_at
+              - column:
+                  name: priority
+                  valueNumeric: 20
+              - column:
+                  name: created_by
+                  value: system
+        - insert:
+            tableName: data_access_control
+            columns:
+              - column:
+                  name: rule_name
+                  value: Confidential Notes Access
+              - column:
+                  name: description
+                  value: Users with CONFIDENTIAL+ clearance can see confidential notes
+              - column:
+                  name: principal_type
+                  value: CLEARANCE
+              - column:
+                  name: principal_value
+                  value: CONFIDENTIAL
+              - column:
+                  name: can_read
+                  valueBoolean: true
+              - column:
+                  name: visible_columns
+                  value: id,name,date,data,confidential_notes,owner_id,created_at
+              - column:
+                  name: attribute_conditions
+                  value: '{"min_clearance": "CONFIDENTIAL"}'
+              - column:
+                  name: priority
+                  valueNumeric: 30
+              - column:
+                  name: created_by
+                  value: system
+        - insert:
+            tableName: data_access_control
+            columns:
+              - column:
+                  name: rule_name
+                  value: Secret Financial Access
+              - column:
+                  name: description
+                  value: Users with SECRET+ clearance can see all financial data
+              - column:
+                  name: principal_type
+                  value: CLEARANCE
+              - column:
+                  name: principal_value
+                  value: SECRET
+              - column:
+                  name: can_read
+                  valueBoolean: true
+              - column:
+                  name: visible_columns
+                  value: id,name,date,data,confidential_notes,financial_data,owner_id,created_at
+              - column:
+                  name: attribute_conditions
+                  value: '{"min_clearance": "SECRET"}'
+              - column:
+                  name: priority
+                  valueNumeric: 40
+              - column:
+                  name: created_by
+                  value: system
+
+  - changeSet:
+      id: 008-insert-time-based-access-rule
+      author: enterprise-datasharing
+      comment: Insert time-based access control rule
+      context: "!prod"
+      changes:
+        - sql:
+            sql: |
+              INSERT INTO data_access_control (rule_name, description, principal_type, principal_value, can_read, can_update, context_conditions, valid_from, valid_until, priority, created_by)
+              VALUES ('Business Hours Only', 'Sensitive data only accessible during business hours', 'ALL', '*', TRUE, TRUE,
+                      '{"business_hours": true, "allowed_ips": ["10.0.0.0/8", "192.168.0.0/16"]}',
+                      CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '1 year', 5, 'system');

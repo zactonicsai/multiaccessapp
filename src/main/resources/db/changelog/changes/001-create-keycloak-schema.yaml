@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-keycloak-schema
+      author: enterprise-datasharing
+      comment: Create schema for Keycloak (separate from application)
+      changes:
+        - sql:
+            sql: CREATE SCHEMA IF NOT EXISTS keycloak;

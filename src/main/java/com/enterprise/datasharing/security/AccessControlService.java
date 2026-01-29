@@ -42,7 +42,7 @@ public class AccessControlService {
     @Value("${app.security.context.business-hours.end:18:00}")
     private String businessHoursEnd;
 
-    @Value("${app.security.context.timezone:America/New_York}")
+    @Value("${app.security.context.business-hours.timezone:America/New_York}")
     private String timezone;
 
     @Value("${app.security.context.require-business-hours:false}")
@@ -51,7 +51,7 @@ public class AccessControlService {
     @Value("${app.security.context.require-allowed-ip:false}")
     private boolean requireAllowedIp;
 
-    @Value("#{'${app.security.context.allowed-ip-ranges}'.split(',')}")
+    @Value("${app.security.context.allowed-ip-ranges:10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,127.0.0.1/32}")
     private List<String> allowedIpRanges;
 
     @Value("${app.security.row-level.enabled:true}")

@@ -1,0 +1,64 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-create-update-timestamp-function
+      author: enterprise-datasharing
+      comment: Create function to auto-update updated_at timestamp
+      changes:
+        - sqlFile:
+            dbms: postgresql
+            path: sql/create-update-timestamp-function.sql
+            relativeToChangelogFile: true
+      rollback:
+        - sql:
+            sql: DROP FUNCTION IF EXISTS update_updated_at_column()
+
+  - changeSet:
+      id: 006-create-my-data-trigger
+      author: enterprise-datasharing
+      comment: Create trigger for my_data table updated_at
+      changes:
+        - sql:
+            dbms: postgresql
+            sql: >
+              DROP TRIGGER IF EXISTS update_my_data_updated_at ON my_data;
+              CREATE TRIGGER update_my_data_updated_at
+              BEFORE UPDATE ON my_data
+              FOR EACH ROW
+              EXECUTE FUNCTION update_updated_at_column();
+      rollback:
+        - sql:
+            sql: DROP TRIGGER IF EXISTS update_my_data_updated_at ON my_data
+
+  - changeSet:
+      id: 006-create-user-attribute-trigger
+      author: enterprise-datasharing
+      comment: Create trigger for user_attribute table updated_at
+      changes:
+        - sql:
+            dbms: postgresql
+            sql: >
+              DROP TRIGGER IF EXISTS update_user_attribute_updated_at ON user_attribute;
+              CREATE TRIGGER update_user_attribute_updated_at
+              BEFORE UPDATE ON user_attribute
+              FOR EACH ROW
+              EXECUTE FUNCTION update_updated_at_column();
+      rollback:
+        - sql:
+            sql: DROP TRIGGER IF EXISTS update_user_attribute_updated_at ON user_attribute
+
+  - changeSet:
+      id: 006-create-data-access-control-trigger
+      author: enterprise-datasharing
+      comment: Create trigger for data_access_control table updated_at
+      changes:
+        - sql:
+            dbms: postgresql
+            sql: >
+              DROP TRIGGER IF EXISTS update_data_access_control_updated_at ON data_access_control;
+              CREATE TRIGGER update_data_access_control_updated_at
+              BEFORE UPDATE ON data_access_control
+              FOR EACH ROW
+              EXECUTE FUNCTION update_updated_at_column();
+      rollback:
+        - sql:
+            sql: DROP TRIGGER IF EXISTS update_data_access_control_updated_at ON data_access_control

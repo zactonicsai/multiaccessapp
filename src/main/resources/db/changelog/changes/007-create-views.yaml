@@ -1,0 +1,63 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-create-data-access-summary-view
+      author: enterprise-datasharing
+      comment: Create view for data access summary reporting
+      changes:
+        - createView:
+            viewName: v_data_access_summary
+            replaceIfExists: true
+            selectQuery: |
+              SELECT 
+                  d.id,
+                  d.name,
+                  d.sensitivity_level,
+                  d.organization_level,
+                  d.owner_department,
+                  d.owner_team,
+                  COUNT(DISTINCT dac.id) as access_rules_count
+              FROM my_data d
+              LEFT JOIN data_access_control dac ON dac.data_id = d.id OR dac.data_id IS NULL
+              WHERE d.deleted = FALSE AND (dac.active = TRUE OR dac.active IS NULL)
+              GROUP BY d.id, d.name, d.sensitivity_level, d.organization_level, d.owner_department, d.owner_team
+
+  - changeSet:
+      id: 007-create-audit-summary-view
+      author: enterprise-datasharing
+      comment: Create view for audit summary reporting
+      changes:
+        - createView:
+            viewName: v_audit_summary
+            replaceIfExists: true
+            selectQuery: |
+              SELECT 
+                  DATE_TRUNC('day', timestamp) as audit_date,
+                  user_id,
+                  action,
+                  access_decision,
+                  COUNT(*) as event_count,
+                  COUNT(DISTINCT entity_id) as unique_entities
+              FROM audit_log
+              GROUP BY DATE_TRUNC('day', timestamp), user_id, action, access_decision
+
+  - changeSet:
+      id: 007-create-access-violations-view
+      author: enterprise-datasharing
+      comment: Create view for access violations reporting
+      changes:
+        - createView:
+            viewName: v_access_violations
+            replaceIfExists: true
+            selectQuery: |
+              SELECT 
+                  timestamp,
+                  user_id,
+                  username,
+                  action,
+                  entity_type,
+                  entity_id,
+                  access_decision,
+                  access_reason,
+                  ip_address
+              FROM audit_log
+              WHERE access_decision != 'GRANTED' AND access_decision IS NOT NULL

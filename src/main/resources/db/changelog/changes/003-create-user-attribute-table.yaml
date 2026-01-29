@@ -1,0 +1,114 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-user-attribute-table
+      author: enterprise-datasharing
+      comment: Create user attributes table for ABAC (Attribute-Based Access Control)
+      changes:
+        - createTable:
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: username
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: department
+                  type: VARCHAR(100)
+              - column:
+                  name: team
+                  type: VARCHAR(100)
+              - column:
+                  name: clearance_level
+                  type: VARCHAR(50)
+                  defaultValue: PUBLIC
+                  constraints:
+                    nullable: false
+              - column:
+                  name: organization_level
+                  type: VARCHAR(50)
+                  defaultValue: INDIVIDUAL
+                  constraints:
+                    nullable: false
+              - column:
+                  name: manager_id
+                  type: VARCHAR(255)
+              - column:
+                  name: is_manager
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: is_department_head
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: is_executive
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: attributes
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+
+  - changeSet:
+      id: 003-create-user-attribute-indexes
+      author: enterprise-datasharing
+      comment: Create indexes for user_attribute table
+      changes:
+        - createIndex:
+            indexName: idx_user_attr_user_id
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: user_id
+        - createIndex:
+            indexName: idx_user_attr_department
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: department
+        - createIndex:
+            indexName: idx_user_attr_team
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: team
+        - createIndex:
+            indexName: idx_user_attr_clearance
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: clearance_level
+        - createIndex:
+            indexName: idx_user_attr_manager
+            tableName: user_attribute
+            columns:
+              - column:
+                  name: manager_id

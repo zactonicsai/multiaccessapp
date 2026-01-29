@@ -1,0 +1,134 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-data-access-control-table
+      author: enterprise-datasharing
+      comment: Create data access control table for Row/Column Level Security
+      changes:
+        - createTable:
+            tableName: data_access_control
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: rule_name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: data_id
+                  type: BIGINT
+              - column:
+                  name: principal_type
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: principal_value
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: can_read
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: can_create
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: can_update
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: can_delete
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: visible_columns
+                  type: TEXT
+              - column:
+                  name: attribute_conditions
+                  type: TEXT
+              - column:
+                  name: context_conditions
+                  type: TEXT
+              - column:
+                  name: valid_from
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: valid_until
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: priority
+                  type: INTEGER
+                  defaultValueNumeric: 0
+              - column:
+                  name: active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+
+  - changeSet:
+      id: 004-add-data-access-control-fk
+      author: enterprise-datasharing
+      comment: Add foreign key constraint to data_access_control table
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: data_access_control
+            baseColumnNames: data_id
+            referencedTableName: my_data
+            referencedColumnNames: id
+            constraintName: fk_dac_my_data
+            onDelete: CASCADE
+
+  - changeSet:
+      id: 004-create-data-access-control-indexes
+      author: enterprise-datasharing
+      comment: Create indexes for data_access_control table
+      changes:
+        - createIndex:
+            indexName: idx_dac_data_id
+            tableName: data_access_control
+            columns:
+              - column:
+                  name: data_id
+        - createIndex:
+            indexName: idx_dac_principal
+            tableName: data_access_control
+            columns:
+              - column:
+                  name: principal_type
+              - column:
+                  name: principal_value
+        - createIndex:
+            indexName: idx_dac_active
+            tableName: data_access_control
+            columns:
+              - column:
+                  name: active
+        - createIndex:
+            indexName: idx_dac_validity
+            tableName: data_access_control
+            columns:
+              - column:
+                  name: valid_from
+              - column:
+                  name: valid_until

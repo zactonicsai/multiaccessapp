@@ -1,0 +1,137 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-my-data-table
+      author: enterprise-datasharing
+      comment: Create main data table for enterprise data sharing
+      changes:
+        - createTable:
+            tableName: my_data
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date
+                  type: DATE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: data
+                  type: TEXT
+              - column:
+                  name: sensitivity_level
+                  type: VARCHAR(50)
+                  defaultValue: INTERNAL
+                  constraints:
+                    nullable: false
+              - column:
+                  name: organization_level
+                  type: VARCHAR(50)
+                  defaultValue: INDIVIDUAL
+                  constraints:
+                    nullable: false
+              - column:
+                  name: owner_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: owner_department
+                  type: VARCHAR(100)
+              - column:
+                  name: owner_team
+                  type: VARCHAR(100)
+              - column:
+                  name: confidential_notes
+                  type: TEXT
+              - column:
+                  name: financial_data
+                  type: TEXT
+              - column:
+                  name: metadata
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  name: updated_by
+                  type: VARCHAR(255)
+              - column:
+                  name: deleted
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: deleted_at
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: deleted_by
+                  type: VARCHAR(255)
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+
+  - changeSet:
+      id: 002-create-my-data-indexes
+      author: enterprise-datasharing
+      comment: Create indexes for my_data table
+      changes:
+        - createIndex:
+            indexName: idx_my_data_owner
+            tableName: my_data
+            columns:
+              - column:
+                  name: owner_id
+        - createIndex:
+            indexName: idx_my_data_department
+            tableName: my_data
+            columns:
+              - column:
+                  name: owner_department
+        - createIndex:
+            indexName: idx_my_data_team
+            tableName: my_data
+            columns:
+              - column:
+                  name: owner_team
+        - createIndex:
+            indexName: idx_my_data_org_level
+            tableName: my_data
+            columns:
+              - column:
+                  name: organization_level
+        - createIndex:
+            indexName: idx_my_data_sensitivity
+            tableName: my_data
+            columns:
+              - column:
+                  name: sensitivity_level
+        - createIndex:
+            indexName: idx_my_data_date
+            tableName: my_data
+            columns:
+              - column:
+                  name: date
+        - createIndex:
+            indexName: idx_my_data_deleted
+            tableName: my_data
+            columns:
+              - column:
+                  name: deleted
