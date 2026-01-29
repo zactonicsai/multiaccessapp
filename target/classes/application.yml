@@ -1,0 +1,96 @@
+spring:
+  application:
+    name: enterprise-data-sharing
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:datasharing}
+    username: ${DB_USERNAME:datasharing}
+    password: ${DB_PASSWORD:datasharing_secret}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/enterprise}
+          jwk-set-uri: ${KEYCLOAK_JWK_URI:http://localhost:8180/realms/enterprise/protocol/openid-connect/certs}
+
+# Keycloak configuration
+keycloak:
+  auth-server-url: ${KEYCLOAK_URL:http://localhost:8180}
+  realm: ${KEYCLOAK_REALM:enterprise}
+  client-id: ${KEYCLOAK_CLIENT_ID:datasharing-api}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET:datasharing-api-secret}
+
+# Application-specific configuration
+app:
+  security:
+    # CBAC - Context-Based Access Control settings
+    context:
+      allowed-ip-ranges:
+        - 10.0.0.0/8
+        - 172.16.0.0/12
+        - 192.168.0.0/16
+        - 127.0.0.1/32
+      business-hours:
+        start: "08:00"
+        end: "18:00"
+        timezone: "America/New_York"
+      require-business-hours: false
+      require-allowed-ip: false
+
+    # Audit settings
+    audit:
+      enabled: true
+      log-sensitive-data: false
+      retention-days: 365
+
+    # Row-level security
+    row-level:
+      enabled: true
+
+    # Column-level security
+    column-level:
+      enabled: true
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+
+# API Documentation
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+# Logging
+logging:
+  level:
+    com.enterprise.datasharing: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

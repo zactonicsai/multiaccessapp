@@ -1,0 +1,708 @@
+{
+  "id": "enterprise",
+  "realm": "enterprise",
+  "displayName": "Enterprise Data Sharing",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxFailureWaitSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "waitIncrementSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "maxDeltaTimeSeconds": 43200,
+  "failureFactor": 5,
+  "defaultRole": {
+    "name": "default-roles-enterprise",
+    "composite": true
+  },
+  "roles": {
+    "realm": [
+      {
+        "name": "ADMIN",
+        "description": "Administrator role with full system access",
+        "composite": false
+      },
+      {
+        "name": "EXECUTIVE",
+        "description": "Executive level access - can view all organization data",
+        "composite": false
+      },
+      {
+        "name": "DEPARTMENT_HEAD",
+        "description": "Department head - can view department and below",
+        "composite": false
+      },
+      {
+        "name": "TEAM_LEAD",
+        "description": "Team lead - can view team and individual data",
+        "composite": false
+      },
+      {
+        "name": "EMPLOYEE",
+        "description": "Standard employee - can view own data",
+        "composite": false
+      },
+      {
+        "name": "AUDITOR",
+        "description": "Auditor role - read-only access to audit logs",
+        "composite": false
+      },
+      {
+        "name": "DATA_STEWARD",
+        "description": "Data steward - can manage data access rules",
+        "composite": false
+      }
+    ],
+    "client": {
+      "datasharing-api": [
+        {
+          "name": "data:read",
+          "description": "Read data"
+        },
+        {
+          "name": "data:write",
+          "description": "Write data"
+        },
+        {
+          "name": "data:delete",
+          "description": "Delete data"
+        },
+        {
+          "name": "audit:read",
+          "description": "Read audit logs"
+        },
+        {
+          "name": "admin:full",
+          "description": "Full admin access"
+        }
+      ]
+    }
+  },
+  "groups": [
+    {
+      "name": "EXECUTIVE",
+      "path": "/EXECUTIVE",
+      "attributes": {
+        "organization_level": ["EXECUTIVE"],
+        "clearance_level": ["TOP_SECRET"]
+      },
+      "realmRoles": ["EXECUTIVE"]
+    },
+    {
+      "name": "ENGINEERING",
+      "path": "/ENGINEERING",
+      "attributes": {
+        "department": ["ENGINEERING"]
+      },
+      "subGroups": [
+        {
+          "name": "MANAGEMENT",
+          "path": "/ENGINEERING/MANAGEMENT",
+          "attributes": {
+            "organization_level": ["DEPARTMENT"],
+            "clearance_level": ["SECRET"]
+          },
+          "realmRoles": ["DEPARTMENT_HEAD"]
+        },
+        {
+          "name": "BACKEND",
+          "path": "/ENGINEERING/BACKEND",
+          "attributes": {
+            "team": ["BACKEND"],
+            "organization_level": ["TEAM"],
+            "clearance_level": ["CONFIDENTIAL"]
+          },
+          "realmRoles": ["TEAM_LEAD"]
+        },
+        {
+          "name": "FRONTEND",
+          "path": "/ENGINEERING/FRONTEND",
+          "attributes": {
+            "team": ["FRONTEND"],
+            "organization_level": ["TEAM"],
+            "clearance_level": ["CONFIDENTIAL"]
+          },
+          "realmRoles": ["TEAM_LEAD"]
+        }
+      ]
+    },
+    {
+      "name": "SALES",
+      "path": "/SALES",
+      "attributes": {
+        "department": ["SALES"]
+      },
+      "subGroups": [
+        {
+          "name": "MANAGEMENT",
+          "path": "/SALES/MANAGEMENT",
+          "attributes": {
+            "organization_level": ["DEPARTMENT"],
+            "clearance_level": ["SECRET"]
+          },
+          "realmRoles": ["DEPARTMENT_HEAD"]
+        },
+        {
+          "name": "ENTERPRISE",
+          "path": "/SALES/ENTERPRISE",
+          "attributes": {
+            "team": ["ENTERPRISE"],
+            "organization_level": ["TEAM"],
+            "clearance_level": ["CONFIDENTIAL"]
+          },
+          "realmRoles": ["TEAM_LEAD"]
+        }
+      ]
+    },
+    {
+      "name": "HR",
+      "path": "/HR",
+      "attributes": {
+        "department": ["HR"]
+      },
+      "subGroups": [
+        {
+          "name": "MANAGEMENT",
+          "path": "/HR/MANAGEMENT",
+          "attributes": {
+            "organization_level": ["DEPARTMENT"],
+            "clearance_level": ["SECRET"]
+          },
+          "realmRoles": ["DEPARTMENT_HEAD"]
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@enterprise.com",
+      "firstName": "System",
+      "lastName": "Administrator",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ADMIN"],
+      "clientRoles": {
+        "datasharing-api": ["admin:full", "data:read", "data:write", "data:delete", "audit:read"]
+      },
+      "attributes": {
+        "user_id": ["admin-001"],
+        "clearance_level": ["TOP_SECRET"],
+        "organization_level": ["EXECUTIVE"]
+      }
+    },
+    {
+      "username": "john.ceo",
+      "email": "john.ceo@enterprise.com",
+      "firstName": "John",
+      "lastName": "CEO",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "exec123",
+          "temporary": false
+        }
+      ],
+      "groups": ["/EXECUTIVE"],
+      "realmRoles": ["EXECUTIVE"],
+      "clientRoles": {
+        "datasharing-api": ["data:read", "data:write", "data:delete", "audit:read"]
+      },
+      "attributes": {
+        "user_id": ["exec-001"],
+        "clearance_level": ["TOP_SECRET"],
+        "organization_level": ["EXECUTIVE"],
+        "is_executive": ["true"]
+      }
+    },
+    {
+      "username": "sarah.engineering",
+      "email": "sarah.engineering@enterprise.com",
+      "firstName": "Sarah",
+      "lastName": "Engineering",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "dept123",
+          "temporary": false
+        }
+      ],
+      "groups": ["/ENGINEERING/MANAGEMENT"],
+      "realmRoles": ["DEPARTMENT_HEAD"],
+      "clientRoles": {
+        "datasharing-api": ["data:read", "data:write"]
+      },
+      "attributes": {
+        "user_id": ["dept-eng-001"],
+        "department": ["ENGINEERING"],
+        "team": ["MANAGEMENT"],
+        "clearance_level": ["SECRET"],
+        "organization_level": ["DEPARTMENT"],
+        "is_department_head": ["true"],
+        "is_manager": ["true"]
+      }
+    },
+    {
+      "username": "mike.sales",
+      "email": "mike.sales@enterprise.com",
+      "firstName": "Mike",
+      "lastName": "Sales",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "dept123",
+          "temporary": false
+        }
+      ],
+      "groups": ["/SALES/MANAGEMENT"],
+      "realmRoles": ["DEPARTMENT_HEAD"],
+      "clientRoles": {
+        "datasharing-api": ["data:read", "data:write"]
+      },
+      "attributes": {
+        "user_id": ["dept-sales-001"],
+        "department": ["SALES"],
+        "team": ["MANAGEMENT"],
+        "clearance_level": ["SECRET"],
+        "organization_level": ["DEPARTMENT"],
+        "is_department_head": ["true"],
+        "is_manager": ["true"]
+      }
+    },
+    {
+      "username": "lisa.hr",
+      "email": "lisa.hr@enterprise.com",
+      "firstName": "Lisa",
+      "lastName": "HR",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "dept123",
+          "temporary": false
+        }
+      ],
+      "groups": ["/HR/MANAGEMENT"],
+      "realmRoles": ["DEPARTMENT_HEAD"],
+      "clientRoles": {
+        "datasharing-api": ["data:read", "data:write"]
+      },
+      "attributes": {
+        "user_id": ["dept-hr-001"],
+        "department": ["HR"],
+        "team": ["MANAGEMENT"],
+        "clearance_level": ["SECRET"],
+        "organization_level": ["DEPARTMENT"],
+        "is_department_head": ["true"],
+        "is_manager": ["true"]
+      }
+    },
+    {
+      "username": "alice.backend",
+      "email": "alice.backend@enterprise.com",
+      "firstName": "Alice",
+      "lastName": "Backend",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "team123",
+          "temporary": false
+        }
+      ],
+      "groups": ["/ENGINEERING/BACKEND"],
+      "realmRoles": ["TEAM_LEAD"],
+      "clientRoles": {
+        "datasharing-api": ["data:read", "data:write"]
+      },
+      "attributes": {
+        "user_id": ["team-backend-001"],
+        "department": ["ENGINEERING"],
+        "team": ["BACKEND"],
+        "clearance_level": ["CONFIDENTIAL"],
+        "organization_level": ["TEAM"],
+        "is_manager": ["true"],
+        "manager_id": ["dept-eng-001"]
+      }
+    },
+    {
+      "username": "bob.frontend",
+      "email": "bob.frontend@enterprise.com",
+      "firstName": "Bob",
+      "lastName": "Frontend",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "team123",
+          "temporary": false
+        }
+      ],
+      "groups": ["/ENGINEERING/FRONTEND"],
+      "realmRoles": ["TEAM_LEAD"],
+      "clientRoles": {
+        "datasharing-api": ["data:read", "data:write"]
+      },
+      "attributes": {
+        "user_id": ["team-frontend-001"],
+        "department": ["ENGINEERING"],
+        "team": ["FRONTEND"],
+        "clearance_level": ["CONFIDENTIAL"],
+        "organization_level": ["TEAM"],
+        "is_manager": ["true"],
+        "manager_id": ["dept-eng-001"]
+      }
+    },
+    {
+      "username": "dev.one",
+      "email": "dev.one@enterprise.com",
+      "firstName": "Developer",
+      "lastName": "One",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "emp123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["EMPLOYEE"],
+      "clientRoles": {
+        "datasharing-api": ["data:read", "data:write"]
+      },
+      "attributes": {
+        "user_id": ["ind-dev-001"],
+        "department": ["ENGINEERING"],
+        "team": ["BACKEND"],
+        "clearance_level": ["INTERNAL"],
+        "organization_level": ["INDIVIDUAL"],
+        "manager_id": ["team-backend-001"]
+      }
+    },
+    {
+      "username": "dev.two",
+      "email": "dev.two@enterprise.com",
+      "firstName": "Developer",
+      "lastName": "Two",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "emp123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["EMPLOYEE"],
+      "clientRoles": {
+        "datasharing-api": ["data:read", "data:write"]
+      },
+      "attributes": {
+        "user_id": ["ind-dev-002"],
+        "department": ["ENGINEERING"],
+        "team": ["BACKEND"],
+        "clearance_level": ["INTERNAL"],
+        "organization_level": ["INDIVIDUAL"],
+        "manager_id": ["team-backend-001"]
+      }
+    },
+    {
+      "username": "auditor",
+      "email": "auditor@enterprise.com",
+      "firstName": "External",
+      "lastName": "Auditor",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "audit123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["AUDITOR"],
+      "clientRoles": {
+        "datasharing-api": ["audit:read", "data:read"]
+      },
+      "attributes": {
+        "user_id": ["auditor-001"],
+        "clearance_level": ["SECRET"],
+        "organization_level": ["EXECUTIVE"]
+      }
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "datasharing-api",
+      "name": "Data Sharing API",
+      "description": "Backend API for data sharing application",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "datasharing-api-secret",
+      "bearerOnly": true,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "publicClient": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "access.token.lifespan": "3600"
+      },
+      "protocolMappers": [
+        {
+          "name": "realm-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "realm_roles",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "client-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-client-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "client_roles",
+            "jsonType.label": "String",
+            "usermodel.clientRoleMapping.clientId": "datasharing-api"
+          }
+        },
+        {
+          "name": "user_id",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "user_id",
+            "user.attribute": "user_id",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "department",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "department",
+            "user.attribute": "department",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "team",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "team",
+            "user.attribute": "team",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "clearance_level",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "clearance_level",
+            "user.attribute": "clearance_level",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "organization_level",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "organization_level",
+            "user.attribute": "organization_level",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "is_manager",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "is_manager",
+            "user.attribute": "is_manager",
+            "jsonType.label": "boolean"
+          }
+        },
+        {
+          "name": "is_department_head",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "is_department_head",
+            "user.attribute": "is_department_head",
+            "jsonType.label": "boolean"
+          }
+        },
+        {
+          "name": "is_executive",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "is_executive",
+            "user.attribute": "is_executive",
+            "jsonType.label": "boolean"
+          }
+        },
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "consentRequired": false,
+          "config": {
+            "full.path": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "groups",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "datasharing-web",
+      "name": "Data Sharing Web Client",
+      "description": "Frontend web application",
+      "enabled": true,
+      "clientAuthenticatorType": "client-secret",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "publicClient": true,
+      "protocol": "openid-connect",
+      "rootUrl": "http://localhost:3000",
+      "baseUrl": "/",
+      "redirectUris": [
+        "http://localhost:3000/*",
+        "http://localhost:8080/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000",
+        "http://localhost:8080"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "access.token.lifespan": "3600"
+      }
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "datasharing-scope",
+      "description": "Custom scope for data sharing application",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true"
+      }
+    }
+  ],
+  "defaultDefaultClientScopes": [
+    "role_list",
+    "profile",
+    "email",
+    "roles",
+    "web-origins"
+  ],
+  "defaultOptionalClientScopes": [
+    "offline_access",
+    "address",
+    "phone",
+    "microprofile-jwt"
+  ],
+  "browserSecurityHeaders": {
+    "contentSecurityPolicyReportOnly": "",
+    "xContentTypeOptions": "nosniff",
+    "xRobotsTag": "none",
+    "xFrameOptions": "SAMEORIGIN",
+    "contentSecurityPolicy": "frame-src 'self'; frame-ancestors 'self'; object-src 'none';",
+    "xXSSProtection": "1; mode=block",
+    "strictTransportSecurity": "max-age=31536000; includeSubDomains"
+  },
+  "smtpServer": {},
+  "eventsEnabled": true,
+  "eventsListeners": ["jboss-logging"],
+  "enabledEventTypes": [
+    "LOGIN",
+    "LOGIN_ERROR",
+    "LOGOUT",
+    "LOGOUT_ERROR",
+    "CODE_TO_TOKEN",
+    "CODE_TO_TOKEN_ERROR",
+    "REFRESH_TOKEN",
+    "REFRESH_TOKEN_ERROR"
+  ],
+  "adminEventsEnabled": true,
+  "adminEventsDetailsEnabled": true
+}

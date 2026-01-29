@@ -1,0 +1,98 @@
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+  datasource:
+    url: jdbc:postgresql://postgres:5432/datasharing
+    username: datasharing
+    password: datasharing_secret
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/enterprise
+          jwk-set-uri: http://keycloak:8080/realms/enterprise/protocol/openid-connect/certs
+
+keycloak:
+  auth-server-url: http://keycloak:8080
+  realm: enterprise
+  resource: datasharing-api
+  credentials:
+    secret: datasharing-api-secret
+
+# Access control configuration
+access-control:
+  rbac:
+    enabled: true
+  abac:
+    enabled: true
+  cbac:
+    enabled: true
+    allowed-ip-ranges:
+      - "10.0.0.0/8"
+      - "172.16.0.0/12"
+      - "192.168.0.0/16"
+      - "0.0.0.0/0"  # Allow all in Docker environment
+    business-hours:
+      enabled: false  # Disabled for testing
+      start: "00:00"
+      end: "23:59"
+      timezone: "UTC"
+  row-level:
+    enabled: true
+  column-level:
+    enabled: true
+
+# Audit configuration
+audit:
+  enabled: true
+  log-sensitive-data: false
+  retention-days: 365
+  async-logging: true
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.enterprise.datasharing: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: WARN
+
+server:
+  port: 8080
+  forward-headers-strategy: framework
